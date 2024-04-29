@@ -1,0 +1,307 @@
+Q) Write a jdbc application to select student record based on student number?
+
+package com.ihub.www;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.Scanner;
+
+public class SelectApp2
+{
+	public static void main(String[] args)throws Exception 
+	{
+		Scanner sc=new Scanner(System.in);
+		
+		System.out.println("Enter the student no :");
+		int no=sc.nextInt();
+		
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+		Connection con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE","system","admin");
+		Statement st=con.createStatement();
+		
+		String qry="select * from student where sno="+no;
+		
+		ResultSet rs=st.executeQuery(qry);
+		
+		int cnt=0;
+		while(rs.next())
+		{
+			System.out.println(rs.getInt(1)+" "+rs.getString(2)+" "+rs.getString(3));
+			cnt=1;
+		}
+		if(cnt==0)
+			System.out.println("No Rows Selected");
+		
+		rs.close();
+		st.close();
+		con.close();
+	}
+}
+
+Non-Select Queries
+------------------
+
+Q) Write a jdbc application to insert a record into student table?
+
+
+package com.ihub.www;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
+import java.util.Scanner;
+
+public class InsertApp 
+{
+	public static void main(String[] args)throws Exception  
+	{
+		Scanner sc=new Scanner(System.in);
+		
+		System.out.println("Enter the student No :");
+		int no=sc.nextInt();
+		
+		System.out.println("Enter the student Name :");
+		String name=sc.next();
+		
+		System.out.println("Enter the student Address :");
+		String add=sc.next();
+		
+		//convert string input values according to SQL Query.
+		name="'"+name+"'";
+		add="'"+add+"'";
+		
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+		Connection con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE","system","admin");
+		Statement st=con.createStatement();
+		
+		String qry="insert into student values("+no+","+name+","+add+")";
+		
+		int result=st.executeUpdate(qry);
+		
+		if(result==0)
+			System.out.println("No Record Inserted");
+		else
+			System.out.println(result+" Record Inserted");
+		
+		st.close();
+		con.close();
+		
+	}
+}
+
+Q) Write a JDBC application to update student name based on student number?
+
+
+package com.ihub.www;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
+import java.util.Scanner;
+
+public class UpdateApp 
+{
+	public static void main(String[] args)throws Exception
+	{
+		Scanner sc=new Scanner(System.in);
+		
+		System.out.println("Enter the student no :");
+		int no=sc.nextInt();
+		
+		System.out.println("Enter the student name :");
+		String name=sc.next();
+		
+		//converting string inputs according to SQL query
+		name="'"+name+"'";
+		
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+		Connection con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE","system","admin");
+		Statement st=con.createStatement();
+		
+		String qry="update student set sname="+name+" where sno="+no;
+		
+		int result=st.executeUpdate(qry);
+		
+		if(result==0)
+			System.out.println("No Record Updated");
+		else
+			System.out.println(result+ " Record Updated");
+		
+		st.close();
+		con.close();
+		
+	}
+}
+
+Q) Write a jdbc application to delete student record based on student no?
+
+
+package com.ihub.www;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
+import java.util.Scanner;
+
+public class DeleteApp 
+{
+	public static void main(String[] args)throws Exception  
+	{
+		Scanner sc=new Scanner(System.in);
+		System.out.println("Enter the student no :");
+		int no=sc.nextInt();
+		
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+		Connection con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE","system","admin");
+		Statement st=con.createStatement();
+		
+		String qry="delete from student where sno="+no;
+		
+		int result=st.executeUpdate(qry);
+		if(result==0)
+			System.out.println("No Record Deleted");
+		else
+			System.out.println(result +" Record Deleted");
+		
+		st.close();
+		con.close();
+	}
+}
+
+SQL Injection Problem
+=====================
+Along with input values if we pass special SQL instructions which change the behaviour of a query and behaviour of an application is called SQL Injection Problem.
+
+Here special SQL instructions means comments in SQL i.e --.
+
+While dealing with simple Statement object there is a chance of raising SQL injection problem.
+
+ex:
+	enter the username : raja'--
+	enter the password : hyd
+
+	Valid Credentials 
+
+
+userlist table
+==============
+drop table userlist;
+
+create table userlist(uname varchar2(10),pwd varchar2(10));
+
+insert into userlist values('raja','rani');
+
+insert into userlist values('king','kingdom');
+
+commit;
+
+
+ex:
+---
+package com.ihub.www;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.Scanner;
+
+public class SQLInjProbApp 
+{
+	public static void main(String[] args)throws Exception  
+	{
+		Scanner sc=new Scanner(System.in);
+		System.out.println("Enter the username :");
+		String name=sc.next();
+		System.out.println("Enter the password :");
+		String pass=sc.next();
+		
+		//converting inputs according to SQL query
+		name="'"+name+"'";
+		pass="'"+pass+"'";
+		
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+		Connection con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE","system","admin");
+		Statement st=con.createStatement();
+		
+		String qry="select count(*) from userlist where uname="+name+" and pwd="+pass;
+		
+		ResultSet rs=st.executeQuery(qry);
+		
+		int result=0;
+		
+		while(rs.next())
+		{
+			result=rs.getInt(1);
+		}
+		if(result==0)
+			System.out.println("Invalid Credentials");
+		else
+			System.out.println("Valid Credentials ");
+		
+		rs.close();
+		st.close();
+		con.close();
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,137 @@
+Type1 JDBC Driver Architecture / JDBC-ODBC Bridge Driver (Partly Java Driver)
+=============================================================================
+Type1 JDBC driver is not designed to interact with database software directly.
+
+Type1 JDBC driver is designed to take the support of ODBC driver and Vendor DB library to locate and interact with database software.
+
+Diagram: jdbc5.1
+
+Advantages:
+
+> It is a built in driver of JDK.
+
+> Using Type1 JDBC driver we can interact with any database software.
+
+Disadvantages:
+
+> This driver performance is low.Hence it is not suitable for medium and large scale projects.
+  It is not a industry standard driver.
+
+> To work with Type1 JDBC driver we need to arrange ODBC driver and vendor db library.
+
+> Since ODBC driver and vendor db library present at client side.So it is not suitable to perform 
+  untrusted applets to database communication.
+
+
+
+Type2 JDBC Driver Architecture / (Native API) (partly java driver)
+======================================================
+Type2 JDBC driver is not designed to interact with database software directly.
+
+It is designed to take the support vendor db library to locate and interact with database software.
+
+Diagram: jdbc5.2
+
+Advantages:
+
+> Type2 JDBC driver will not take the support of ODBC driver.
+
+> It will give better performance when compare to Type1 JDBC driver.
+
+Disadvantages:
+
+> This driver performance is quit slow.Hence it is not suitable for medium and large scale   
+  projects. It is not a industry standard driver.
+
+> To work with Type2 JDBC driver we need to arrange vendor db library seperately.
+
+> Since vendor db library present at client side so it is not suitable to perform untrusted applets 
+  to database communication.
+
+> For every database we need to arrange Type2 JDBC driver seperately.
+
+
+Type4 JDBC driver Architecture  / Native Procotol (Java driver) (thin driver)
+===============================================================
+Type4 JDBC driver is not designed to take the support of ODBC driver and vendor db library.
+
+It is designed to interact with database software directly.
+
+Diagram: jdbc5.3
+
+Advantages:
+
+> This driver will give better performance when compare to Type1 and Type2 JDBC driver.
+
+> It is suitable for medium and large scale projects.Hence it is a industry standard driver 
+
+> It is developed by using java so it will give platform independency.
+
+> It will not take the support ODBC driver and vendor db library.
+
+> Since ODBC driver and vendor db library not present at client so it is suitable to perform 
+  untrusted applets to database communication.
+
+Disadvantages:
+
+> It is not a built in driver of JDK.
+
+> For every database software we need to arrange type4 jdbc driver seperately.
+
+
+JDBC Connection pool
+====================
+It is a factory containing set of readily available JDBC Connection objects before actual being used.
+
+JDBC Connection pool represent connectivity with same database software.
+
+Diagram: jdbc5.4
+
+Advantages:
+
+> It will give reusable JDBC Connection object.
+
+> A user is not responsible to create,manage and destroy JDBC Connection objects. A JDBC connection pool is responsible to create,manage and destroy JDBC Connection objects.
+
+> With minimum number of Connection object we can interact with multiple clients.
+
+
+Type3 JDBC Driver  Architecture / (Net Protocol)
+================================================
+Webserver, Proxy server or IDE's server contains JDBC Connection pool. 
+
+Type3 JDBC driver is not designed to interact with database software directly. 
+
+It is designed to interact with web server or proxy srever or IDE's server to get one reusable JDBC Connection object from JDBC Connection pool.
+
+Diagram: jdbc5.5
+
+with respect to the diagram:
+
+1) Webserver interacts with database software and gets JDBC Connection objects in JDBC 
+   connection pool.
+
+2) Our application interacts with webserver and gets one reusable JDBC Connection object from 
+   JDBC connection pool.
+
+3) Our application uses JDBC Connection object to create other Connection objects.
+
+4) Once if we call con.close() then JDBC Connection object goes back to JDBC Connection pool.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

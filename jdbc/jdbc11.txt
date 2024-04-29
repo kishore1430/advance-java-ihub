@@ -1,0 +1,340 @@
+
+
+Standard procedure to develop JDBC application
+================================================
+
+package com.ihub.www;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class StandardApp 
+{
+	public static void main(String[] args) 
+	{
+		final String DRIVER="oracle.jdbc.driver.OracleDriver";
+		final String URL="jdbc:oracle:thin:@localhost:1521:XE";
+		final String USERNAME="system";
+		final String PASSWORD="admin";
+		final String QUERY="select * from student";
+		
+	
+		Connection con=null;
+		Statement st=null;
+		ResultSet rs=null;
+		String qry=null;
+		try
+		{
+			Class.forName(DRIVER);
+			con=DriverManager.getConnection(URL,USERNAME,PASSWORD);
+			st=con.createStatement();
+			rs=st.executeQuery(qry);
+			while(rs.next())
+			{
+				System.out.println(rs.getRow()+" "+rs.getInt(1)+" "+rs.getString(2)+" "+rs.getString(3));
+			}
+			
+			rs.close();
+			st.close();
+			con.close();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+}
+
+
+Steps to interact with MYSQL Database
+===================================
+step1:
+------
+	Download and Install MY/SQL Database successully.
+	ex:
+	https://drive.google.com/file/d/1QQjWTJ9v8xz0nfuSGva1_QQwO6KDf9_c/view?usp=sharing
+
+step2:
+--------
+	Connect with mysql by using password.
+	ex:
+	username : root( default)
+	password: root
+
+step3:
+-------
+	create a SCHEMA in MYSQL.
+	ex:
+		create schema IH_JAVA_029
+
+step4:
+-------
+	To check list of databases /schemas present in mysql db.
+	ex:
+		show databases;
+
+step5:
+-------
+	Use IH_JAVA_029 scheme/database.	
+	ex:
+		use   IH_JAVA_029;
+
+step6:
+---------
+	create a student table and insert the records.
+	ex:
+	create table student(sno int(3),sname varchar(10),sadd varchar(10));
+	insert into student values(101,'raja','hyd');
+	insert into student values(102,'raju','delhi');
+	insert into student values(103,'ravi','pune');
+	commit;
+step7:
+---------
+	create a JDBC Application to select student records.
+
+MySQLApp.java
+------------------------
+package com.ihub.www;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class MySQLApp 
+{
+	public static void main(String[] args) 
+	{
+		final String DRIVER="com.mysql.jdbc.Driver";
+final String URL="jdbc:mysql://localhost:3306/IH_JAVA_024?characterEncoding=utf8";
+		final String USERNAME="root";
+		final String PASSWORD="root";
+		final String QUERY="select * from student";
+		
+		Connection con=null;
+		Statement st=null;
+		ResultSet rs=null;
+		try
+		{
+			Class.forName(DRIVER);
+			con=DriverManager.getConnection(URL,USERNAME,PASSWORD);
+			st=con.createStatement();
+			rs=st.executeQuery(QUERY);
+			while(rs.next())
+			{
+				System.out.println(rs.getRow()+" "+rs.getInt(1)+" "+rs.getString(2)+" "+rs.getString(3));
+			}
+			
+			rs.close();
+			st.close();
+			con.close();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+}
+
+
+
+	
+step8:
+--------
+	Add "mysql-connector.jar" file in project build path for mysql database.
+
+	right click to project --> built path --> configuration build path --> libraries
+	--> add external jars --> select mysql-connector.jar file --> open.
+
+
+	jar file download : 
+	http://www.java2s.com/Code/Jar/m/Downloadmysqlconnectorjavajar.htm		
+
+
+	Note:
+	ojdbc14.jar  - - for oracle 	
+ 
+	mysql-connector-java.jar --> for mysql
+
+step9:
+--------
+	Run the jdbc application.
+
+
+
+
+Q) What is the difference between RDBMS and MongoDB?
+
+RDBMS						MongoDB
+-----------					-----------
+It is a relational  database.			It is a non-relational database or 
+						document oriented database.
+
+It is not suitable for hierarchical data.	It is suitable for hierarchical data.
+
+It will not store the data in key and value	It will store the data in key and value pair. 
+pair.
+
+Tables						Collections 
+
+Rows						Documents 
+
+Columns						Fields
+
+
+
+
+
+Steps to develop java application to interact with MongoDB 
+==========================================================
+step1:
+-----
+	Download and Install MongoDB Atlas/Compass.
+	ex:
+	https://drive.google.com/file/d/1hqzPIqjl-TUfSzIq8xpiJHaYVuu2Ut52/view?usp=sharing
+		
+step2:
+-----
+	Download and extract Mongo shell.
+	ex:
+		https://www.mongodb.com/try/download/shell
+
+step3:
+-----
+	Copy and Paste Mongoshell inside MongoDB folder.
+	ex:
+		C:\Program Files\MongoDB
+
+step4:
+-----
+	Copy "bin" directory of mongosh and paste in environment variables.
+	ex:
+		Right click to my pc --> properties --> advanced system settings -->
+		environmental variables --> system variables --> click on path --> edit button
+		--> new  --> C:\Program Files\MongoDB\mongosh-2.1.0-win32-x64\bin 
+		(add the bin directory) --> ok --> ok -->ok.
+	
+
+step5:
+------
+	Open the command prompt and type below command to use mongo client.
+	ex:
+		cmd> mongosh
+
+step6:
+------
+	Check list of commands of mongodb.
+	ex:
+		show dbs;
+
+		use mydb;
+
+		db.createCollection("student");
+
+		db.student.insertOne({
+			"id":1,
+			"name":"Alan Morries",
+			"add":"Texas"
+		})
+
+		db.student.findOne();
+
+		db.student.findOne({name:"Alan Morries"});
+
+		db.dropDatabase();
+
+step7:
+------
+	Launch eclipse IDE by choosing workspace location.
+
+step8:
+------
+	Create a java project i.e MongoDBProj.
+	ex:
+		File --> new --> project --> java project --> Next --> 
+		Project Name : MongoDBProj --> Next --> Finish.
+
+step9:
+-----
+	Download and Extract mongodb jar files.
+	ex:
+		https://jar-download.com/artifact-search/mongodb-driver-sync
+
+step10:
+------
+	Add the jar files to project build path.
+	ex:
+		Right click to MongDBProj --> build path --> configuration build path
+		--> libraries --> add external jars --> add 4 jar files of mongodb -->
+		open --> ok.
+
+step11:
+-------
+	Create a TestApp.java file inside "src/com.ihub.www" package
+
+package com.ihub.www;
+
+import org.bson.Document;
+
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+
+public class TestApp 
+{
+	public static void main(String[] args) 
+	{
+		
+		// Connect to MongoDB
+        try (MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017")) 
+        {
+            // Access a database
+            MongoDatabase database = mongoClient.getDatabase("mydb");
+
+            // Access a collection
+            MongoCollection<Document> collection = database.getCollection("mycollection");
+
+            // Insert a document
+            Document document = new Document("no", 1)
+                    .append("name", "Alan")
+                    .append("add", "Texas");
+            collection.insertOne(document);
+
+            // Query the collection
+            Document query = new Document("no", 1);
+            Document result = collection.find(query).first();
+            System.out.println("Result: " + result);
+        }
+    }
+	
+}
+
+step12:
+-------
+	Run the project.
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,194 @@
+Type4 JDBC Driver / Native Protocol (Java Driver)
+=================================================
+
+Driver Name 		:	oracle.jdbc.driver.OracleDriver
+				------------------ ------------
+					  |		  |
+					pkg name 	classname
+
+								logical database name 
+								  |
+Driver URL 		:	jdbc:oracle:thin:@localhost:1521:XE
+			        -----------------   |        |
+					|	    |	     |
+				sub protocol   hostname   portno 
+
+
+Database username 	:	system
+
+Database password 	:	admin 
+
+Eclipse
+=========
+IDE		:	JEE IDE 
+
+Environment	:	Java Environment 
+
+Flavour		:	Kepler, Indigo, Mars, Luna and etc.
+
+Vendor		:	Eclipse Foundation 
+
+Website		:	www.eclipse.org 
+
+Open source	:	Open source 
+
+File Format	:	Zip file
+
+Download link	:	
+
+https://www.eclipse.org/downloads/packages/release/kepler/sr2/eclipse-ide-java-ee-developers
+
+
+Extract the Eclipse 
+====================
+right click to the eclipse zip file ----> Extract All ---> select 'E' location --> Extract.
+
+
+
+Steps to develop First JDBC Application using Eclipse IDE
+=========================================================
+step1:
+-----
+	Create a student table and insert the records.
+
+	ex:
+		drop table student;
+		create table student(sno number(3),sname varchar2(10),sadd varchar2(12));				insert into student values(101,'raja','hyd');
+		insert into student values(102,'ravi','delhi');
+		insert into student values(103,'ramana','vizag');
+		commit;
+
+step2:
+------
+	Launch eclipse IDE by choosing workspace location.
+
+
+step3:
+-----
+	Create a Java project i.e IH-JAVA-030.
+	ex:
+		File --> new  --> project --> java project --> Next -->
+		Name : IH-JAVA-030 --> Next ---> Finish.
+
+step4:
+------
+	Create a "com.ihub.www" package inside "src" folder.
+	ex:
+		right click to src folder --> new --> package --> Name : com.ihub.www --> Finish.
+
+step5:
+-----
+	Create a "SelectApp.java" file inside "com.ihub.www" package.
+	ex:
+		right click to com.ihub.ww pkg --> new --> class --> Name : SelectApp --> finish.
+
+
+SelectApp.java
+---------------
+package com.ihub.www;
+
+//ctrl+shift+o
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class SelectApp 
+{
+	public static void main(String[] args)throws Exception  
+	{
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+		Connection con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE","system","admin");
+		Statement st=con.createStatement();
+		ResultSet rs=st.executeQuery("select * from student");
+		while(rs.next())
+		{
+			System.out.println(rs.getInt(1)+" "+rs.getString(2)+" "+rs.getString(3));
+		}
+		rs.close();
+		st.close();
+		con.close();
+	}
+}
+
+
+step6:
+-----
+	Add "ojdbc14.jar" file in project build path.
+	ex:
+		right click to project ---> build path --> configure build path -->
+		libraries --> add external jars --> select "ojdbc14.jar" file --> open -->ok.
+
+
+step7:
+-----
+	Run the SelectApp.java file
+	ex:
+		right click to SelectApp.java ---> run as --> Java application.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

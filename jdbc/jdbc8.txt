@@ -1,0 +1,322 @@
+Working with Date values
+=========================
+While dealing with DOB, DOR, DOA, DOD and etc we need to insert and retrieve date values.
+
+It is never recommanded to  store date values in the form strings because it will not give proper comparision between two dates.
+
+Every database software supports different date patterns.
+
+ex:
+	oracle - dd-MMM-yy
+	MySQL  - yyyy-MM-dd 
+
+Using simple Statement we can't use date values in the query parameter.
+
+To overcome this limitation we need to PreparedStatement object.
+
+PreparedStatement object is used to set the date value to query parameter by using ps.setDate(-,-) method.
+
+A java.util.Date class object is not suitable to perform database operation.
+
+A java.sql.Date class object is suitable to perform database operation.
+
+JDBC driver will insert date value in the pattern which is supported by underlying database software.
+
+
+Standard procedure to insert date values
+------------------------------------------
+Diagram: jdbc8.1
+
+With respect to the diagram:
+
+1) Enduser will give date value in the form of String.
+
+2) A parse() of java.text.SimpleDateFormat class is used to convert string date to util date.
+
+3) Our application converts java.util.Date class object java.sql.Date class object.
+
+4) Using ps.setDate(-,-) method we will set date value to query parameter.
+
+5) Once jdbc driver get the date value then it will insert the pattern which is supported by 
+   underlying database software.
+
+
+emp1 table
+==========
+drop table emp1;
+
+create table emp1(eid number(3),ename varchar2(10),edoj date);
+
+
+ex:
+---
+package com.ihub.www;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.text.SimpleDateFormat;
+import java.util.Scanner;
+
+public class DateInsertApp 
+{
+	public static void main(String[] args)throws Exception  
+	{
+		Scanner sc=new Scanner(System.in);
+		System.out.println("Enter the employee id :");
+		int id=sc.nextInt();
+		System.out.println("Enter the employee name :");
+		String name=sc.next();
+		System.out.println("Enter the employee DOJ (dd-MM-yyyy) : ");
+		String doj=sc.next();
+		
+		//convert string date to util date 
+		SimpleDateFormat sdf=new SimpleDateFormat("dd-MM-yyyy");
+		java.util.Date udoj=sdf.parse(doj);
+		
+		//converting util date to sql date 
+		long ms=udoj.getTime();
+		java.sql.Date sqldoj=new java.sql.Date(ms);
+		
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+		Connection con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE","system","admin");
+
+		String qry="insert into emp1 values(?,?,?)";
+		
+		PreparedStatement ps=con.prepareStatement(qry);
+		
+		//set the values
+		ps.setInt(1,id);
+		ps.setString(2,name);
+		ps.setDate(3,sqldoj);
+		
+		//execute 
+		int result=ps.executeUpdate();
+		if(result==0)
+			System.out.println("No Record inserted");
+		else
+			System.out.println("Record inserted");
+		
+		ps.close();
+		con.close();
+	
+	}
+}
+
+
+DateRetrieveApp.jav
+-----------------
+package com.ihub.www;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+
+public class DateRetrieveApp 
+{
+	public static void main(String[] args)throws Exception  
+	{
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+		Connection con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE","system","admin");
+		Statement st=con.createStatement();
+		String qry="select * from emp1";
+		ResultSet rs=st.executeQuery(qry);
+		while(rs.next())
+		{
+			int id=rs.getInt(1);
+			String name=rs.getString(2);
+			
+			java.sql.Date sqldoj=rs.getDate(3);
+			
+			//converting sql date to util date
+			java.util.Date udoj=(java.util.Date)sqldoj;
+			
+			//converting util date to string date 
+			SimpleDateFormat sdf=new SimpleDateFormat("dd-MM-yyyy");
+			String sdoj=sdf.format(udoj);
+			
+			System.out.println(id+" "+name+" "+sdoj);
+		}
+		rs.close();
+		st.close();
+		con.close();
+	}
+}
+
+Working with LOB values
+=======================
+Files are known as LOB's.
+
+We have two types of LOB's.
+
+1) BLOB (Binary Large Object)
+----------------------------
+	ex:
+		images, audio, video, avi file and etc.
+
+2) CLOB (Character Large Object)
+----------------------------
+	ex:
+		text file, advanced text file, doc file and etc.
+
+While dealing with matrimonial applications, job portal applications, profile management applications we need to insert and retrieve LOB values.
+
+Using simple Statement object we can't use lob values to query parameter.
+
+To overcome this limitation we need to use PreparedStatement object.
+
+PreparedStatement object will set the LOB values by using 
+
+ex:
+	ps.setBinaryStream(-,-,-)/ps.setBLOB(-,-,-)
+	ps.setCharacterStream(-,-,-)/ps.setCLOB(-,-,-)
+
+
+emp2 table
+==========
+drop table emp2;
+create table emp2(eid number(3),ename varchar2(10), ephoto BLOB);
+
+
+ex:
+
+package com.ihub.www;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.util.Scanner;
+
+public class PhotoInsertApp 
+{
+	public static void main(String[] args)throws Exception  
+	{
+		Scanner sc=new Scanner(System.in);
+		System.out.println("Enter the employee id :");
+		int id=sc.nextInt();
+		System.out.println("Enter the employee name :");
+		String name=sc.next();
+		
+		//locate a file 
+		File f=new File("src/com/ihub/www/rock.jpg");
+		FileInputStream fis=new FileInputStream(f);
+		
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+		Connection con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE","system","admin");
+		
+		String qry="insert into emp2 values(?,?,?)";
+		
+		PreparedStatement ps=con.prepareStatement(qry);
+		
+		//set the values
+		ps.setInt(1,id);
+		ps.setString(2,name);
+		ps.setBinaryStream(3,fis,(int)f.length());
+		
+		//execute
+		int result=ps.executeUpdate();
+		if(result==0)
+			System.out.println("No Record inserted");
+		else
+			System.out.println("Record inserted");
+		
+		ps.close();
+		con.close();
+		
+	}
+}
+
+PhotoRetrieveApp.java
+-------------------
+package com.ihub.www;
+
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class PhotoRetrieveApp 
+{
+	public static void main(String[] args)throws Exception  
+	{
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+		Connection con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE","system","admin");
+		Statement st=con.createStatement();
+		String qry="select * from emp2";
+		ResultSet rs=st.executeQuery(qry);
+		while(rs.next())
+		{
+			InputStream is=rs.getBinaryStream(3);
+			
+			FileOutputStream fos=new FileOutputStream("E:\\IHUB-TRAINING-BATCHES\\swaroop.jpg");
+			
+			int byteReads=0;
+			byte[] buff=new byte[255];
+			
+			while((byteReads=is.read(buff))!=-1)
+			{
+				fos.write(buff, 0, byteReads);
+			}
+			fos.close();
+			
+		}
+		System.out.println("Please check the location.");
+		rs.close();
+		st.close();
+		con.close();
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
